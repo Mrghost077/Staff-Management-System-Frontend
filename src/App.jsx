@@ -1,9 +1,7 @@
-const App = () => {
-  return (
-    <>
-      <h1>Welcome to TeachGrid</h1>
-    </>
-  )
+import Dashboard from "./components/Dashboard";
+
+export default function App() {
+  return <Dashboard />;
 }
 
-export default App
+
