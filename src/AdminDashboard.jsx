@@ -1,12 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
+import NavigationBar from "./NavigationBar.jsx";
 import {
-  Home,
-  Calendar,
-  ClipboardList,
   Users,
   Bell,
-  Settings,
-  LogOut,
   UserCheck,
   UserX,
   Clock,
@@ -15,67 +11,7 @@ import {
   XCircle
 } from "lucide-react";
 
-// Navigation Sidebar Component
-function NavigationBar({ activeView, setActiveView }) {
-  return (
-    <aside className="w-64 bg-white shadow-lg p-6 flex flex-col justify-between h-screen">
-      <div>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center text-lg font-semibold">
-            RD
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-800">Ravindu Deshan</h3>
-            <h2 className="text-sm text-gray-500">deshanravindu256@gmail.com</h2>
-          </div>
-        </div>
-
-        <span className="inline-block bg-gray-100 text-black text-xs font-medium px-2 py-1 rounded-full mb-10">
-          Admin
-        </span>
-
-        <div className="border-t border-gray-300 mb-6"></div>
-
-        <nav className="space-y-4">
-          {[
-            { name: "Dashboard", icon: <Home size={20} /> },
-            { name: "Attendance Records", icon: <Calendar size={20} /> },
-            { name: "Leave Management", icon: <ClipboardList size={20} /> },
-            { name: "Relief Duty", icon: <Users size={20} /> },
-            { name: "Announcement", icon: <Bell size={20} /> },
-          ].map((item) => (
-            <button
-              key={item.name}
-              onClick={() => setActiveView(item.name)}
-              className={`flex items-center gap-3 p-2 w-full text-left rounded-md transition-colors ${
-                activeView === item.name
-                  ? "bg-black text-white"
-                  : "text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {item.icon} {item.name}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      <div className="space-y-3">
-        <button className="flex items-center gap-3 p-2 text-gray-700 hover:bg-gray-200 rounded-md w-full text-left">
-          <Settings size={18} /> Settings
-        </button>
-
-        <button className="flex items-center gap-3 p-2 text-red-600 hover:bg-red-100 rounded-md w-full text-left">
-          <LogOut size={18} /> Sign Out
-        </button>
-      </div>
-    </aside>
-  );
-}
-
-// Admin Dashboard Component
 function AdminDashboard() {
-  const [activeView, setActiveView] = useState("Dashboard");
-
   // Sample data
   const leaveRequests = [
     {
@@ -117,10 +53,10 @@ function AdminDashboard() {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <NavigationBar activeView={activeView} setActiveView={setActiveView} />
-      
-      <main className="flex-1 overflow-y-auto">
+    <div className="flex font-sans bg-gray-50 min-h-screen">
+      <NavigationBar />
+        
+      <div className="flex-1 overflow-y-auto">
         {/* Header */}
         <header className="bg-white shadow-sm px-8 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
@@ -286,11 +222,11 @@ function AdminDashboard() {
                     <span className="font-medium">Add New Teacher</span>
                   </button>
                   <button className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-3">
-                    <Calendar size={18} />
+                    <Users size={18} />
                     <span className="font-medium">Assign Relief Duty</span>
                   </button>
                   <button className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-3">
-                    <ClipboardList size={18} />
+                    <Users size={18} />
                     <span className="font-medium">Generate Report</span>
                   </button>
                   <button className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-3">
@@ -306,7 +242,7 @@ function AdminDashboard() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
