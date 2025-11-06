@@ -1,9 +1,11 @@
+import AdminDashboard from "./AdminDashboard";
 import Attendance from "./Attendance";
 
 function App () {
   return (
     <div>
-      <Attendance/>
+      <AdminDashboard/>
+      {/* <Attendance/> */}
     </div>
   )
 }
