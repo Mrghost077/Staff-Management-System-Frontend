@@ -1,5 +1,5 @@
 import React from "react";
-import { TrendingUp, CheckCircle, Users, FileText } from "lucide-react";  // <-- icons from lucide-react
+import { TrendingUp, CheckCircle, Users, FileText } from "lucide-react";  
 
 export default function Cardviews() {
   return (

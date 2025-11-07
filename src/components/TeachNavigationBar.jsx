@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Home, Calendar, ClipboardList, Users, Bell, Settings, LogOut } from "lucide-react";
 
 export default function TeachNavigationBar() {
-  const [activeItem, setActiveItem] = useState(""); // Track which button is active
+  const [activeItem, setActiveItem] = useState(""); {/*Track which button is active*/}
 
   return (
     <aside className="w-64 bg-white shadow-lg p-6 flex flex-col justify-between h-screen">
