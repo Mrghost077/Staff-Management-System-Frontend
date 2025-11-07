@@ -14,7 +14,7 @@ export default function Sidebar() {
             SP
           </div>
           <div>
-            <h3 className="font-semibold text-gray-800">Sama Perera</h3>
+            <h3 className="font-semibold text-gray-800">Sama Perera</h3> {/*tempory added this part*/}
             <h2 className="text-sm text-gray-500">perera@gmail.com</h2>
           </div>
         </div>

@@ -1,22 +1,30 @@
 import React from "react";
 import Sidebar from "./Sidebar";
+import TopBar from "./TopBar";
 
 export default function Dashboard() {
 return (
 
+// sidebar include here
       <div className="flex h-screen bg-gray-100">
         <Sidebar/>
 
+    <div className="flex-1 flex flex-col">
+      <TopBar/>
+    
 
-    <main className="flex-1 p-4">
+
+    <main className="flex-1 p-4"> 
+      {/*greating*/}
     <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-xl shadow mb-6">
-          <h2 className="text-2xl font-semibold">Welcome back, John Smith!</h2>
+          <h2 className="text-2xl font-semibold">Welcome back, Sama Perera!</h2>
           <p className="text-sm opacity-90">Here's your overview for today.</p>
         </div>
 
         
     </main>
 
+</div>
 </div>
 
 
