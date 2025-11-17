@@ -17,7 +17,7 @@ const mockUser = {
   id: '1',
   name: 'Sarah Johnson',
   email: 'admin@teachgrid.edu',
-  role: 'admin',
+  role: 'teacher',
   avatar: 'SJ'
 }
 
