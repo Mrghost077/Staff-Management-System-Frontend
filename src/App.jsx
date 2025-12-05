@@ -1,6 +1,6 @@
-
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useUser } from './contexts/UserContext'
+import SignInPage from './pages/SignInPage'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminReliefAssignment from './pages/admin/AdminReliefAssignment'
@@ -16,6 +16,7 @@ import TeacherLeaveManagement from './pages/teacher/LeaveManagement'
 import TeacherReliefDuty from './pages/teacher/ReliefDuty'
 import TeacherAnnouncements from './pages/teacher/Announcements'
 import TeacherSettings from './pages/teacher/Settings'
+
 import NotAuthorized from './pages/NotAuthorized'
 
 const App = () => {
@@ -29,19 +30,22 @@ const App = () => {
     )
   }
 
-  // Redirect based on user role
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-600">Please log in</div>
-      </div>
-    )
-  }
-
   return (
     <Routes>
-      {/* Admin Routes */}
-      {user.role === 'admin' ? (
+
+      {/* PUBLIC ROUTE → SIGN IN PAGE */}
+      <Route path="/" element={<SignInPage />} />
+
+      {/* If not logged in, block admin and teacher routes */}
+      {!user && (
+        <>
+          <Route path="/admin/*" element={<Navigate to="/" replace />} />
+          <Route path="/teacher/*" element={<Navigate to="/" replace />} />
+        </>
+      )}
+
+      {/* ADMIN ROUTES */}
+      {user?.role === 'admin' ? (
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
@@ -56,8 +60,8 @@ const App = () => {
         <Route path="/admin/*" element={<NotAuthorized />} />
       )}
 
-      {/* Teacher Routes */}
-      {user.role === 'teacher' ? (
+      {/* TEACHER ROUTES */}
+      {user?.role === 'teacher' ? (
         <Route path="/teacher" element={<TeacherLayout />}>
           <Route index element={<Navigate to="/teacher/dashboard" replace />} />
           <Route path="dashboard" element={<TeacherDashboard />} />
@@ -70,21 +74,8 @@ const App = () => {
       ) : (
         <Route path="/teacher/*" element={<NotAuthorized />} />
       )}
-
-      {/* Default redirect */}
-      <Route
-        path="/"
-        element={
-          user.role === 'admin' ? (
-            <Navigate to="/admin/relief-assignment" replace />
-          ) : (
-            <Navigate to="/teacher/dashboard" replace />
-          )
-        }
-      />
     </Routes>
-
   )
 }
 
-export default App;
+export default App
