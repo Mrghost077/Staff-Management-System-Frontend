@@ -1,3 +1,5 @@
+import React from 'react'
+import { Link } from 'react-router-dom'
 import {
   Bell,
   Users,
@@ -11,33 +13,9 @@ import {
 
 const AdminDashboard = () => {
   const leaveRequests = [
-    {
-      id: 1,
-      name: 'John Smith',
-      initials: 'JS',
-      type: 'Medical Leave',
-      dates: 'Jan 15 - Jan 17',
-      priority: 'high',
-      submitted: '2 days ago'
-    },
-    {
-      id: 2,
-      name: 'Emily Davis',
-      initials: 'ED',
-      type: 'Personal Leave',
-      dates: 'Jan 20',
-      priority: 'medium',
-      submitted: '1 day ago'
-    },
-    {
-      id: 3,
-      name: 'Michael Johnson',
-      initials: 'MJ',
-      type: 'Family Emergency',
-      dates: 'Jan 22 - Jan 24',
-      priority: 'high',
-      submitted: '3 hours ago'
-    }
+    { id: 1, name: 'John Smith', initials: 'JS', type: 'Medical Leave', dates: 'Jan 15 - Jan 17', priority: 'high', submitted: '2 days ago' },
+    { id: 2, name: 'Emily Davis', initials: 'ED', type: 'Personal Leave', dates: 'Jan 20', priority: 'medium', submitted: '1 day ago' },
+    { id: 3, name: 'Michael Johnson', initials: 'MJ', type: 'Family Emergency', dates: 'Jan 22 - Jan 24', priority: 'high', submitted: '3 hours ago' }
   ]
 
   const teacherAvailability = [
@@ -51,12 +29,11 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex-1 overflow-y-auto bg-gray-50">
+      {/* Header */}
       <header className="bg-white shadow-sm px-8 py-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
         <div className="flex items-center gap-4">
-          <button className="p-2 hover:bg-gray-100 rounded-full">
-            <Bell size={20} />
-          </button>
+          <button className="p-2 hover:bg-gray-100 rounded-full"><Bell size={20} /></button>
           <button className="p-2 hover:bg-gray-100 rounded-full">
             <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold">AD</div>
           </button>
@@ -64,11 +41,13 @@ const AdminDashboard = () => {
       </header>
 
       <div className="p-8">
+        {/* Admin Overview */}
         <div className="bg-gradient-to-r from-purple-500 via-purple-600 to-pink-500 rounded-2xl p-8 mb-8 text-white">
           <h2 className="text-3xl font-bold mb-2">Admin Overview</h2>
           <p className="text-purple-100">Manage your school's teaching staff and operations.</p>
         </div>
 
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
@@ -78,7 +57,6 @@ const AdminDashboard = () => {
             <p className="text-4xl font-bold text-gray-900 mb-2">45</p>
             <p className="text-sm text-gray-500">Active staff members</p>
           </div>
-
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-gray-600 font-medium">Present Today</h3>
@@ -90,7 +68,6 @@ const AdminDashboard = () => {
             </div>
             <p className="text-sm text-gray-500">93% attendance</p>
           </div>
-
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-gray-600 font-medium">On Leave</h3>
@@ -99,7 +76,6 @@ const AdminDashboard = () => {
             <p className="text-4xl font-bold text-orange-600 mb-2">3</p>
             <p className="text-sm text-gray-500">Teachers absent today</p>
           </div>
-
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-gray-600 font-medium">Pending Requests</h3>
@@ -110,7 +86,9 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        {/* Main Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Leave Requests */}
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-2 mb-6">
               <Clock size={24} />
@@ -162,7 +140,9 @@ const AdminDashboard = () => {
             </button>
           </div>
 
+          {/* Teacher Availability & Quick Actions */}
           <div className="space-y-6">
+            {/* Teacher Availability */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center gap-2 mb-6">
                 <TrendingUp size={24} />
@@ -197,23 +177,30 @@ const AdminDashboard = () => {
               </button>
             </div>
 
+            {/* Quick Actions */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="text-xl font-bold mb-2">Quick Actions</h3>
               <p className="text-gray-500 mb-6">Common administrative tasks</p>
 
               <div className="space-y-3">
-                <button className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-3">
+                <Link
+                  to="/admin/signup" // Link to your existing AdminSignup page
+                  className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-3"
+                >
                   <Users size={18} />
-                  <span className="font-medium">Add New Teacher</span>
-                </button>
+                  <span className="font-medium">Add New Teacher/Admin</span>
+                </Link>
+
                 <button className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-3">
                   <Users size={18} />
                   <span className="font-medium">Assign Relief Duty</span>
                 </button>
+
                 <button className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-3">
                   <Users size={18} />
                   <span className="font-medium">Generate Report</span>
                 </button>
+
                 <button className="w-full py-3 px-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-3">
                   <Bell size={18} />
                   <span className="font-medium">Create Announcement</span>
@@ -232,5 +219,3 @@ const AdminDashboard = () => {
 }
 
 export default AdminDashboard
-
-
