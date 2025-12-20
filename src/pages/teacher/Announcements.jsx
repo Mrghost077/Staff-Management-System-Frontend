@@ -119,8 +119,4 @@ export default function TeacherAnnouncements() {
 
       
 
-      {/* Announcements */}
-      <AnnouncementList />
-    </main>
-  );
-}
+
