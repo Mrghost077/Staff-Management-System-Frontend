@@ -139,22 +139,25 @@ const Attendance = () => {
           <table className="w-full border-collapse">
             <thead className="text-xs text-slate-500 border-b">
               <tr>
-                <th className="py-3 text-left">Teacher</th>
-                <th>Subject</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Check In</th>
-                <th>Check Out</th>
-                <th>Actions</th>
+                <th className="py-3 text-left align-middle">Teacher</th>
+                <th className="align-middle">Subject</th>
+                <th className="align-middle text-center">Date</th>
+                <th className="align-middle text-center">Status</th>
+                <th className="align-middle text-center w-28">Check In</th>
+                <th className="align-middle text-center w-28">Check Out</th>
+                <th className="align-middle text-center w-20">Actions</th>
+                
               </tr>
             </thead>
 
             <tbody className="divide-y">
               {filtered.map(row => (
                 <tr key={row.id} className="hover:bg-slate-50">
-                  <td className="py-3 font-medium">{row.absentTeacher}</td>
 
-                  <td>
+                  <td className="py-3 font-medium align-middle">
+                    {row.absentTeacher}</td>
+
+                  <td className='align-middle text-center'>
                     {editingId === row.id ? (
                       <select
                         className="border rounded p-1"
@@ -166,9 +169,10 @@ const Attendance = () => {
                     ) : row.subject}
                   </td>
 
-                  <td>{row.date}</td>
+                  <td className='align-middle text-center'>
+                    {row.date}</td>
 
-                  <td>
+                  <td className='align-middle text-center'>
                     {editingId === row.id ? (
                       <select
                         className="border rounded p-1"
@@ -182,7 +186,7 @@ const Attendance = () => {
                     ) : statusBadge(row.status)}
                   </td>
 
-                  <td>
+                  <td className='align-middle text-center w-28'>
                     {editingId === row.id ? (
                       <input type="time" className="border rounded p-1"
                         value={editData.checkIn}
@@ -191,7 +195,7 @@ const Attendance = () => {
                     ) : row.checkIn || '-'}
                   </td>
 
-                  <td>
+                  <td className='align-middle text-center w-28'>
                     {editingId === row.id ? (
                       <input type="time" className="border rounded p-1"
                         value={editData.checkOut}
@@ -200,7 +204,7 @@ const Attendance = () => {
                     ) : row.checkOut || '-'}
                   </td>
 
-                  <td className="space-x-2">
+                  <td className="align-middle text-center w-24 space-x-2">
                     {editingId === row.id ? (
                       <>
                         <button onClick={() => handleSave(row.id)} className="text-green-600">Save</button>
