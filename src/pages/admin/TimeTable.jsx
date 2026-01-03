@@ -1,283 +1,268 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Header from "../../components/Header";
 
-const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-const periods = Array.from({ length: 8 }, (_, i) => `Period ${i + 1}`);
+const api = axios.create({
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
+});
 
-const subjects = [
-  "",
-  "Sinhala",
-  "Maths",
-  "Buddhism",
-  "English",
-  "Science",
-  "History",
-  "Geography",
-  "Civic Education",
-  "Business Studies",
-  "Information Technology",
-  "Art",
-  "Music",
-  "Dance",
-  "Drama",
-  "P.T.S.",
-  "Health Education",
-];
+const GRADES = [6, 7, 8, 9, 10, 11];
+const SECTIONS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const SUBJECTS = ["Sinhala", "Maths", "English", "Science", "History", "Geography", 
+  "ICT", "Art", "Music","Health Education", "Civics"];
 
-const grades = ["Grade 6", "Grade 7", "Grade 8", "Grade 9", "Grade 10", "Grade 11"];
+const Timetable = () => {
+  const [teachers, setTeachers] = useState([]);
+  const [timetables, setTimetables] = useState([]);
+  const [gradeNumber, setGradeNumber] = useState("6");
+  const [gradeSection, setGradeSection] = useState("A");
 
-// use Vite env instead of hard-coded localhost
-const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api/timetables`;
-
-const createInitialData = () =>
-  periods.map(() => {
-    const row = {};
-    days.forEach((d) => {
-      row[d] = { subject: "", teacher: "" };
-    });
-    return row;
+  const [form, setForm] = useState({
+    teacher: "",
+    grade: "6A",
+    subject: "",
+    dayOfWeek: "Monday",
+    period: 1,
   });
 
-const TimeTable = () => {
-  const [timetables, setTimetables] = useState({});
-  const [selectedGrade, setSelectedGrade] = useState("Grade 6");
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState("");
-  const [statusType, setStatusType] = useState("info");
-
-  const currentTimetable = timetables[selectedGrade] || createInitialData();
-
-  // Fetch timetable
   useEffect(() => {
-    const fetchTimetable = async () => {
-      setLoading(true);
-      setStatus("");
-      setStatusType("info");
+    api.get("/timetable/teachers")
+      .then((res) => setTeachers(res.data?.data || []))
+      .catch((err) => console.error(err));
 
-      try {
-        const res = await fetch(`${API_URL}/${selectedGrade}`, {
-          credentials: "include",
-        });
+    loadTimetables();
+  }, []);
 
-        if (!res.ok) {
-          setTimetables((prev) => ({
-            ...prev,
-            [selectedGrade]: createInitialData(),
-          }));
-          return;
-        }
+  useEffect(() => {
+    setForm((prev) => ({
+      ...prev,
+      grade: `${gradeNumber}${gradeSection}`,
+    }));
+  }, [gradeNumber, gradeSection]);
 
-        const data = await res.json();
-        setTimetables((prev) => ({
-          ...prev,
-          [selectedGrade]: data.table || createInitialData(),
-        }));
-      } catch (error) {
-        console.error(error);
-        setStatus("Failed to load timetable");
-        setStatusType("error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTimetable();
-  }, [selectedGrade]);
-
-  // Save timetable
-  const saveTimetable = useCallback(async () => {
-    setSaving(true);
-    setStatus("");
-    setStatusType("info");
-
+  const loadTimetables = async () => {
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          grade: selectedGrade,
-          table: currentTimetable,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setStatus(data.message || "Save failed");
-        setStatusType("error");
-        return;
-      }
-
-      setStatus("Timetable saved successfully!");
-      setStatusType("success");
-    } catch (error) {
-      setStatus("Server error");
-      setStatusType("error");
-    } finally {
-      setSaving(false);
-      setTimeout(() => setStatus(""), 3000);
+      const res = await api.get("/timetable");
+      setTimetables(res.data?.data || []);
+    } catch (err) {
+      console.error("Failed to load timetables", err);
     }
-  }, [selectedGrade, currentTimetable]);
-
-  // Update cell value
-  const handleChange = (pIndex, day, field) => (e) => {
-    const value = e.target.value;
-
-    setTimetables((prev) => {
-      const updated = [...currentTimetable];
-      updated[pIndex] = {
-        ...updated[pIndex],
-        [day]: {
-          ...updated[pIndex][day],
-          [field]: value,
-        },
-      };
-      return { ...prev, [selectedGrade]: updated };
-    });
   };
 
-  const statusClasses =
-    statusType === "success"
-      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-      : statusType === "error"
-      ? "bg-red-50 text-red-700 border-red-200"
-      : "bg-slate-50 text-slate-600 border-slate-200";
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: name === "period" ? Number(value) : value,
+    }));
+  };
 
-  if (loading) {
-    return (
-      <div className="p-6 text-center text-sm text-slate-500">
-        Loading timetable...
-      </div>
-    );
-  }
+  const submit = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post("/timetable", form);
+      alert("Timetable entry added successfully!");
+      loadTimetables();
+      setForm({
+        teacher: "",
+        grade: `${gradeNumber}${gradeSection}`,
+        subject: "",
+        dayOfWeek: "Monday",
+        period: 1,
+      });
+    } catch (err) {
+      alert(err.response?.data?.message || "Error saving timetable");
+    }
+  };
+
+  //Delete function
+  const deleteEntry = async (entryId) => {
+    if (!confirm("Are you sure you want to delete this timetable entry?")) {
+      return;
+    }
+
+    try {
+      await api.delete(`/timetable/${entryId}`);
+      alert("Timetable entry deleted successfully!");
+      loadTimetables();
+    } catch (err) {
+      alert(err.response?.data?.message || "Error deleting timetable entry");
+    }
+  };
+
+  const filteredTimetables = timetables.filter(
+    (t) => t.grade === `${gradeNumber}${gradeSection}`
+  );
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
-      {/* Heading */}
-      <div className="mb-6 border-b border-indigo-300/60 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-4xl font-extrabold tracking-tight">
-            <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 bg-clip-text text-transparent drop-shadow-sm">
-              Time Table
-            </span>
-          </h1>
-          <p className="mt-1 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase">
-            Weekly Schedule Management
-          </p>
-        </div>
+    <>
+      <Header title="Timetable Management" />
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-slate-700">Grade:</span>
-          <div className="relative">
+      <div className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+        {/* FILTER SECTION */}
+        <div className="flex flex-wrap gap-4 mb-8 items-center">
+          <div className="flex gap-2">
             <select
-              value={selectedGrade}
-              onChange={(e) => setSelectedGrade(e.target.value)}
-              className="appearance-none rounded-xl border border-indigo-200 bg-white px-4 py-2 text-sm font-medium text-slate-800
-                         shadow-sm pl-5 pr-9 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400
-                         hover:border-indigo-300 transition"
+              value={gradeNumber}
+              onChange={(e) => setGradeNumber(e.target.value)}
+              className="p-2 border rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
             >
-              {grades.map((g) => (
+              {GRADES.map((g) => (
                 <option key={g}>{g}</option>
               ))}
             </select>
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400 text-xs">
-              ▼
-            </span>
-          </div>
-        </div>
-      </div>
 
-      {/* Status bar + Save button */}
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {status && (
-          <div
-            className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium ${statusClasses}`}
+            <select
+              value={gradeSection}
+              onChange={(e) => setGradeSection(e.target.value)}
+              className="p-2 border rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+            >
+              {SECTIONS.map((s) => (
+                <option key={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={loadTimetables}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm transition"
           >
-            <span
-              className={`h-2 w-2 rounded-full ${
-                statusType === "success"
-                  ? "bg-emerald-500"
-                  : statusType === "error"
-                  ? "bg-red-500"
-                  : "bg-slate-400"
-              }`}
+            🔄 Refresh
+          </button>
+
+          <h3 className="ml-auto text-gray-700 text-sm font-medium">
+            Viewing timetable for:{" "}
+            <span className="font-semibold text-gray-900">
+              Grade {gradeNumber} - {gradeSection}
+            </span>
+          </h3>
+        </div>
+
+        {/* ADD FORM */}
+        <div className="bg-white p-6 rounded-xl shadow-lg mb-8 border border-blue-50">
+          <h2 className="text-xl font-semibold mb-6 text-gray-800">
+            ➕ Add Timetable Entry
+          </h2>
+
+          <form onSubmit={submit} className="grid md:grid-cols-3 gap-4">
+            <select
+              name="teacher"
+              value={form.teacher}
+              onChange={handleChange}
+              required
+              className="p-3 border border-gray-200 rounded-lg bg-gradient-to-r from-gray-50 to-blue-50 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+            >
+              <option value="">Select Teacher</option>
+              {teachers.map((t) => (
+                <option key={t._id} value={t._id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="subject"
+              value={form.subject}
+              onChange={handleChange}
+              required
+              className="p-3 border border-gray-200 rounded-lg bg-gradient-to-r from-gray-50 to-blue-50 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+            >
+              <option value="">Select Subject</option>
+              {SUBJECTS.map((s) => (
+                <option key={s}>{s}</option>
+              ))}
+            </select>
+
+            <select
+              name="dayOfWeek"
+              value={form.dayOfWeek}
+              onChange={handleChange}
+              className="p-3 border border-gray-200 rounded-lg bg-gradient-to-r from-gray-50 to-blue-50 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+            >
+              {DAYS.map((d) => (
+                <option key={d}>{d}</option>
+              ))}
+            </select>
+
+            <input
+              type="number"
+              name="period"
+              min="1"
+              max="8"
+              value={form.period}
+              onChange={handleChange}
+              className="p-3 border border-gray-200 rounded-lg bg-gradient-to-r from-gray-50 to-blue-50 shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
             />
-            {status}
-          </div>
-        )}
 
-        <button
-          onClick={saveTimetable}
-          disabled={saving}
-          className="inline-flex items-center justify-center gap-2 rounded-md bg-indigo-600 px-5 py-2 text-sm font-medium text-white shadow-sm 
-                     hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          {saving ? "💾 Saving..." : "💾 Save Timetable"}
-        </button>
-      </div>
+            <button
+              type="submit"
+              className="md:col-span-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 px-6 rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+            >
+              ➕ Add Entry
+            </button>
+          </form>
+        </div>
 
-      {/* Timetable Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md">
-        <div className="max-h-[520px] overflow-auto">
-          <table className="min-w-full text-xs">
-            <thead className="sticky top-0 z-10 bg-indigo-50">
-              <tr className="border-b border-slate-200 text-indigo-700">
-                <th className="border-r px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide">
-                  Period
-                </th>
-                {days.map((d) => (
-                  <th
-                    key={d}
-                    className="border-r border-slate-200 px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide"
-                  >
-                    {d}
+        {/* TIMETABLE TABLE */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-blue-50">
+          <table className="w-full border-collapse text-sm">
+            <thead className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+              <tr>
+                <th className="border p-4 text-left font-semibold">Day</th>
+                {[...Array(8)].map((_, i) => (
+                  <th key={i} className="border p-4 text-center font-semibold">
+                    Period {i + 1}
                   </th>
                 ))}
               </tr>
             </thead>
-
             <tbody>
-              {periods.map((period, pIndex) => (
-                <tr
-                  key={period}
-                  className={pIndex % 2 === 0 ? "bg-white" : "bg-slate-50"}
-                >
-                  <td className="border-r border-slate-200 px-3 py-3 text-[11px] font-semibold text-slate-700 whitespace-nowrap">
-                    {period}
+              {DAYS.map((day) => (
+                <tr key={day} className="hover:bg-blue-50 transition">
+                  <td className="border p-3 font-medium bg-gradient-to-r from-blue-50 to-indigo-50">
+                    {day}
                   </td>
-                  {days.map((day) => (
-                    <td
-                      key={day}
-                      className="border-r border-slate-200 px-2 py-2 font-semibold"
-                    >
-                      <select
-                        value={currentTimetable[pIndex][day].subject}
-                        onChange={handleChange(pIndex, day, "subject")}
-                        className="mb-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-800 shadow-sm focus:ring-1 focus:ring-indigo-400 font-semibold"
+                  {[...Array(8)].map((_, p) => {
+                    const entry = filteredTimetables.find(
+                      (t) => t.dayOfWeek === day && t.period === p + 1
+                    );
+                    return (
+                      <td
+                        key={p}
+                        className="border p-3 text-center text-gray-700 relative"
                       >
-                        {subjects.map((s) => (
-                          <option key={s || "none"} value={s}>
-                            {s || "Select subject"}
-                          </option>
-                        ))}
-                      </select>
-                      <input
-                        value={currentTimetable[pIndex][day].teacher}
-                        onChange={handleChange(pIndex, day, "teacher")}
-                        placeholder="Teacher name"
-                        className="w-full rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-800 placeholder:text-slate-400 focus:bg-white focus:ring-1 focus:ring-indigo-400 font-semibold"
-                      />
-                    </td>
-                  ))}
+                        {entry ? (
+                          <div className="group cursor-pointer">
+                            <div className="font-semibold text-sm text-gray-900 mb-1">
+                              {entry.subject}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {entry.teacher?.name}
+                            </div>
+                            {/* Delete Button */}
+                            <button
+                              onClick={() => deleteEntry(entry._id)}
+                              className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs font-bold flex items-center justify-center shadow-lg group-hover:opacity-100 opacity-0 transition-all duration-200"
+                              title="Delete Entry"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 font-medium">—</span>
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default TimeTable;
+export default Timetable;
