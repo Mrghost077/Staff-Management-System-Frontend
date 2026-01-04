@@ -130,7 +130,7 @@ const Timetable = () => {
             {/* Table header */}
             <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="border p-3 text-center">Period/Day</th>
+                <th className="border p-3 text-center">Period</th>
                 {DAYS.map((day) => (
                   <th key={day} className="border p-3 text-center">
                     {day}
