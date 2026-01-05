@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from "react";
 import Header from "../../components/Header";
 import axios from "axios";
 
-// Helper to get API URL
 const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:3301';
 
 const StatCard = ({ title, value, subtitle, icon }) => (
@@ -21,18 +20,13 @@ const StatCard = ({ title, value, subtitle, icon }) => (
 );
 
 const StatusBadge = ({ status }) => {
-  // 1. We define how each status looks and what it says
   const config = {
     present: { label: "Present", style: "bg-green-100 text-green-700" },
     leave: { label: "Leave", style: "bg-red-100 text-red-700" },
     late: { label: "Late", style: "bg-orange-100 text-orange-700" },
     unmarked: { label: "Not Marked", style: "bg-slate-100 text-slate-500" }
   };
-
-  // 2. We look up the status sent from the backend. 
-  // If it's missing, we default to "unmarked"
   const current = config[status] || config['unmarked'];
-
   return (
     <span className={`px-2 py-1 rounded text-xs font-semibold ${current.style}`}>
       {current.label}
@@ -43,17 +37,16 @@ const StatusBadge = ({ status }) => {
 const Attendance = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 7)); // Default: Current Month YYYY-MM
+  const [specificDate, setSpecificDate] = useState(""); // For single day calendar
+  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7)); // Default: Current Month
   const [isExporting, setIsExporting] = useState(false);
 
-  // 1. Fetch Teacher's Attendance
   useEffect(() => {
     const fetchMyAttendance = async () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_BASE_URL}/api/attendance/my-attendance`, {
-          withCredentials: true // Crucial for JWT cookies
+          withCredentials: true 
         });
         if (response.data.success) {
           setAttendanceData(response.data.data);
@@ -67,46 +60,44 @@ const Attendance = () => {
     fetchMyAttendance();
   }, []);
 
-  // 2. Filter Logic (Month + Search)
+  // Filter Logic: If specificDate is picked, show that. Otherwise, show the Month.
   const filteredData = useMemo(() => {
     return attendanceData.filter((row) => {
-      const matchesSearch = row.date.includes(search);
-      const matchesMonth = row.date.startsWith(date);
-      return matchesSearch && matchesMonth;
+      if (specificDate) {
+        return row.date === specificDate;
+      }
+      return row.date.startsWith(month);
     });
-  }, [attendanceData, search, date]);
+  }, [attendanceData, specificDate, month]);
 
-  // 3. Stats Calculation
   const stats = useMemo(() => {
-    // Only calculate stats for the selected month's data
-    const monthlyRecords = attendanceData.filter(d => d.date.startsWith(date));
+    const monthlyRecords = attendanceData.filter(d => d.date.startsWith(month));
     const total = monthlyRecords.length;
     const present = monthlyRecords.filter(d => d.status === "present").length;
     const late = monthlyRecords.filter(d => d.status === "late").length;
+    const leave = monthlyRecords.filter(d => d.status === "leave").length;
     
     return {
       rate: total > 0 ? `${Math.round(((present + late) / total) * 100)}%` : "0%",
       presentDays: present + late,
-      leaveDays: monthlyRecords.filter(d => d.status === "leave").length
+      leaveDays: leave
     };
-  }, [attendanceData, date]);
+  }, [attendanceData, month]);
 
   const handleExport = async () => {
     setIsExporting(true);
-
-    const teacherId = attendanceData.length > 0 ? attendanceData[0].teacher : null;
+    const teacherId = attendanceData.length > 0 ? (attendanceData[0].teacher || attendanceData[0].userId) : null;
 
     if (!teacherId) {
-        alert("No records found to export.");
-        setIsExporting(false);
-        return;
+      alert("No records found to export.");
+      setIsExporting(false);
+      return;
     }
-
-    const url = `${API_BASE_URL}/api/attendance/export/pdf?date=${date}&teacherId=${teacherId}`;
-    
+    // We export based on the selected month
+    const url = `${API_BASE_URL}/api/attendance/export/pdf?date=${month}&teacherId=${teacherId}`;
     window.open(url, '_blank');
     setIsExporting(false);
-};
+  };
 
   if (loading) return <div className="p-10 text-center">Loading your records...</div>;
 
@@ -115,36 +106,48 @@ const Attendance = () => {
       <Header title="My Attendance History" />
 
       <div className="p-6 max-w-7xl mx-auto">
-        {/* STATS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <StatCard title="Monthly Rate" value={stats.rate} subtitle={`In ${date}`} icon="📊" />
+          <StatCard title="Monthly Rate" value={stats.rate} subtitle={`In ${month}`} icon="📊" />
           <StatCard title="Days Attended" value={stats.presentDays} subtitle="Present + Late" icon="✅" />
           <StatCard title="Days on Leave" value={stats.leaveDays} subtitle="Approved Leaves" icon="❌" />
         </div>
 
-        {/* CONTROLS */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-6">
             <div className="flex flex-col">
-              <label className="text-xs font-bold text-gray-400 mb-1 ml-1">FILTER MONTH</label>
+              <label className="text-xs font-bold text-gray-400 mb-1 ml-1">FILTER BY MONTH</label>
               <input
                 type="month"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="border border-gray-200 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                value={month}
+                onChange={(e) => {
+                    setMonth(e.target.value);
+                    setSpecificDate(""); // Reset specific day when month changes
+                }}
+                className="cursor-pointer border border-gray-200 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
               />
             </div>
+
             <div className="flex flex-col">
-              <label className="text-xs font-bold text-gray-400 mb-1 ml-1">SEARCH DATE</label>
-              <input
-                type="text"
-                placeholder="YYYY-MM-DD"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="border border-gray-200 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-              />
+              <label className="text-xs font-bold text-gray-400 mb-1 ml-1">FIND SPECIFIC DATE</label>
+              <div className="flex gap-2">
+                <input
+                  type="date"
+                  value={specificDate}
+                  onChange={(e) => setSpecificDate(e.target.value)}
+                  className="cursor-pointer border border-gray-200 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                />
+                {specificDate && (
+                    <button 
+                        onClick={() => setSpecificDate("")}
+                        className="text-xs text-blue-600 hover:underline"
+                    >
+                        Clear
+                    </button>
+                )}
+              </div>
             </div>
           </div>
+
           <button
             onClick={handleExport}
             disabled={isExporting}
@@ -154,7 +157,6 @@ const Attendance = () => {
           </button>
         </div>
 
-        {/* TABLE */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -182,7 +184,7 @@ const Attendance = () => {
               ) : (
                 <tr>
                   <td colSpan="5" className="p-10 text-center text-gray-400 italic">
-                    No attendance records found for this period.
+                    No attendance records found for this selection.
                   </td>
                 </tr>
               )}
