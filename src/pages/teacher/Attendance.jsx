@@ -93,10 +93,20 @@ const Attendance = () => {
 
   const handleExport = async () => {
     setIsExporting(true);
-    // Open the same export endpoint but for the specific teacher (backend handles filtering by user)
-    window.open(`${API_BASE_URL}/api/attendance/export/pdf?date=${date}`, '_blank');
+
+    const teacherId = attendanceData.length > 0 ? attendanceData[0].teacher : null;
+
+    if (!teacherId) {
+        alert("No records found to export.");
+        setIsExporting(false);
+        return;
+    }
+
+    const url = `${API_BASE_URL}/api/attendance/export/pdf?date=${date}&teacherId=${teacherId}`;
+    
+    window.open(url, '_blank');
     setIsExporting(false);
-  };
+};
 
   if (loading) return <div className="p-10 text-center">Loading your records...</div>;
 
