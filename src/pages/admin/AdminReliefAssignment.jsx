@@ -37,32 +37,30 @@ const AdminReliefAssignment = () => {
   }, [assignments])
 
   const handleLoadAvailable = async (assignment) => {
-    const assignmentId = assignment._id || assignment.id
-    if (!assignmentId) return
-
-    if (availableById[assignmentId]) return
+    const assignmentId = assignment._id || assignment.id;
+    if (!assignmentId || availableById[assignmentId]) return;
 
     try {
-      setAvailableLoadingId(assignmentId)
-      setError('')
-      // FIX: Passing date from attendance object to help backend filtering
+      setAvailableLoadingId(assignmentId);
+      
+      // Determine the ID of the absent teacher
+      const absentTeacherId = assignment.attendance?.teacher?._id || assignment.attendance?.teacher;
+
       const options = await fetchAvailableReliefTeachers({
         dayOfWeek: assignment.dayOfWeek,
         period: assignment.period,
         grade: assignment.grade,
-        date: assignment.attendance?.date 
-      })
-      setAvailableById((prev) => ({ ...prev, [assignmentId]: options ?? [] }))
+        date: assignment.attendance?.date,
+        excludeTeacherId: absentTeacherId // NEW: Send this to the backend
+      });
+      setAvailableById((prev) => ({ ...prev, [assignmentId]: options ?? [] }));
     } catch (availError) {
-      console.error(availError)
-      const status = availError?.response?.status
-      if (status === 403) setError('Only admins can view available relief teachers.')
-      else if (status === 400) setError('Invalid request while fetching available teachers.')
-      else setError('Unable to load available teachers right now.')
+      console.error(availError);
+      setError('Unable to load available teachers.');
     } finally {
-      setAvailableLoadingId(null)
+      setAvailableLoadingId(null);
     }
-  }
+  };
 
   const handleAssignTeacher = async (assignment) => {
     const assignmentId = assignment._id || assignment.id
