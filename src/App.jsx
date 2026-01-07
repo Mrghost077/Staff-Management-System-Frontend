@@ -38,7 +38,7 @@ const PrivateRoute = ({ children, role }) => {
 };
 
 const App = () => {
-  
+
   // Check Dark Mode status when the app starts
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
