@@ -69,9 +69,11 @@ const AdminSignup = () => {
       newErrors.password = "Password must be at least 6 characters.";
 
     // Subject validation: Only required if role is Teacher
-    if (role === "Teacher" && !subject) {
+    if (role.toLowerCase() === "teacher" && !subject) {
         newErrors.subject = "Please select an expertise subject.";
     }
+
+
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // form is valid if no errors
@@ -110,7 +112,7 @@ const AdminSignup = () => {
           role: role.toLowerCase(),
           dateOfBirth,
           address,
-          subject: role === "Teacher" ? subject : "",
+          subjects: role.toLowerCase() === "teacher" ? [subject] : [],
         }),
       });
 
