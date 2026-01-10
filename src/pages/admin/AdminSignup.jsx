@@ -15,6 +15,7 @@ const AdminSignup = () => {
   const [phoneNum, setPhoneNum] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [subject, setSubject] = useState("");
 
   // =========================
   // UI states
@@ -23,6 +24,8 @@ const AdminSignup = () => {
   const [loading, setLoading] = useState(false); // loading state during API call
   const [showSuccessDialog, setShowSuccessDialog] = useState(false); // show success popup
   const [createdUserName, setCreatedUserName] = useState(""); // store name for success message
+  const [responseMessage, setResponseMessage] = useState("");
+  const [emailSentStatus, setEmailSentStatus] = useState(true);
 
   // =========================
   // Error states
@@ -65,6 +68,13 @@ const AdminSignup = () => {
     else if (password.length < 6)
       newErrors.password = "Password must be at least 6 characters.";
 
+    // Subject validation: Only required if role is Teacher
+    if (role.toLowerCase() === "teacher" && !subject) {
+        newErrors.subject = "Please select an expertise subject.";
+    }
+
+
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // form is valid if no errors
   };
@@ -102,6 +112,7 @@ const AdminSignup = () => {
           role: role.toLowerCase(),
           dateOfBirth,
           address,
+          subjects: role.toLowerCase() === "teacher" ? [subject] : [],
         }),
       });
 
@@ -111,6 +122,8 @@ const AdminSignup = () => {
       if (data.success) {
         // Show success dialog
         setCreatedUserName(name);
+        setResponseMessage(data.message); // Store the "Partial Success" message
+        setEmailSentStatus(data.emailSent); // Store whether email succeeded
         setShowSuccessDialog(true);
 
         // Reset form fields
@@ -198,6 +211,38 @@ const AdminSignup = () => {
             />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
+
+          {/* Subject Field - Only visible if Role is Teacher */}
+          {role === "Teacher" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Subject Expertise</label>
+              <select
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className={`mt-1 w-full px-3 py-2 bg-gray-100 border ${
+                  errors.subject ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:ring-2 focus:ring-black focus:outline-none`}
+              >
+                <option value="">Select Subject</option>
+                {/* Use the same SUBJECT_OPTIONS you have in your Attendance component */}
+                <option value="Mathematics">Mathematics</option>
+                <option value="English">English</option>
+                <option value="Science">Science</option>
+                <option value="History">History</option>
+                <option value="Sinhala">Sinhala</option>
+                <option value="Geography">Geography</option>
+                <option value="ICT">ICT</option>
+                <option value="ART">ART</option>
+                <option value="Music">Music</option>
+                <option value="Health Education">Health Education</option>
+                <option value="Civics">Civics</option>
+                {/* ... other options */}
+              </select>
+              {errors.subject && (
+                <p className="text-red-500 text-xs mt-1">{errors.subject}</p>
+              )}
+            </div>
+          )}
 
           {/* Date of Birth */}
           <div>
@@ -297,41 +342,38 @@ const AdminSignup = () => {
           Success Dialog
       ========================= */}
       {showSuccessDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-4">
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                {/* Checkmark icon */}
-                <svg
-                  className="h-8 w-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl">
+          <div className="text-center">
+            {/* Dynamic Icon based on Email Status */}
+            <div className={`mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4 ${emailSentStatus ? 'bg-green-100' : 'bg-amber-100'}`}>
+              {emailSentStatus ? (
+                <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                Account Created Successfully
-              </h3>
-              <p className="text-gray-600 mb-6">
-                The account for <span className="font-semibold">{createdUserName}</span> has been created successfully.
-              </p>
-              <button
-                onClick={() => setShowSuccessDialog(false)}
-                className="w-full py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
-              >
-                Close
-              </button>
+              ) : (
+                <span className="text-2xl">⚠️</span>
+              )}
             </div>
+
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              {emailSentStatus ? "Success!" : "Action Required"}
+            </h3>
+            
+            <p className="text-gray-600 mb-6">
+              {responseMessage} {/* This displays the "Account created but email failed" message */}
+            </p>
+
+            <button
+              onClick={() => setShowSuccessDialog(false)}
+              className={`w-full py-3 rounded-lg font-semibold text-white transition-colors ${emailSentStatus ? 'bg-black hover:bg-gray-800' : 'bg-amber-600 hover:bg-amber-700'}`}
+            >
+              Close
+            </button>
           </div>
         </div>
-      )}
+      </div>
+    )}
     </div>
   );
 };

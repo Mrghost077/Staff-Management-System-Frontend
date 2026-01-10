@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+axios.defaults.withCredentials = true;
+
 const getNodeEnv = (key) =>
   typeof globalThis !== 'undefined' && globalThis.process?.env ? globalThis.process.env[key] : undefined
 
@@ -18,13 +20,12 @@ export const fetchReliefAssignments = async () => {
   return unwrap(data)
 }
 
-export const fetchAvailableReliefTeachers = async ({ dayOfWeek, period, grade }) => {
+export const fetchAvailableReliefTeachers = async ({ dayOfWeek, period, grade, date, excludeTeacherId }) => {
   const { data } = await axios.get(`${API_BASE_URL}/api/relief-assignments/available`, {
-    withCredentials: true,
-    params: { dayOfWeek, period, grade }
-  })
-  return unwrap(data)
-}
+    params: { dayOfWeek, period, grade, date, excludeTeacherId } 
+  });
+  return data.data;
+};
 
 export const assignReliefTeacher = async ({ assignmentId, teacherId }) => {
   const { data } = await axios.post(
@@ -44,4 +45,18 @@ export const generateReliefAssignmentsForAbsence = async (absenceId) => {
   return data
 }
 
+export const fetchMyReliefDuties = async () => {
+  const response = await axios.get(`${API_BASE_URL}/api/relief-assignments/my-duties`, {
+    withCredentials: true 
+  });
+  return response.data.data;
+};
+
+export const updateDutyStatus = async (id, status) => {
+  const response = await axios.patch(`${API_BASE_URL}/api/relief-assignments/${id}/status`, 
+    { status },
+    { withCredentials: true }
+  );
+  return response.data.data;
+};
 

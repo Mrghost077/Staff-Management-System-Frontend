@@ -138,11 +138,15 @@ const Attendance = () => {
     return teachersList.map(teacher => {
       const teacherIdStr = teacher._id?.toString() || teacher._id
       const attendance = attendanceMap.get(teacherIdStr)
+      const profileSubject = (teacher.subjects && teacher.subjects.length > 0) 
+                                ? teacher.subjects[0] 
+                                : '';
       if (attendance) {
         return {
           ...attendance,
           teacherId: teacher._id,
           userId: teacher._id,
+          subject: profileSubject || attendance.subject || '',
           date: targetDate, // Ensure date matches selected date
           absentTeacher: attendance.teacherName || teacher.name || teacher.email || 'Unknown Teacher'
         }
@@ -154,7 +158,7 @@ const Attendance = () => {
           userId: teacher._id,
           teacherId: teacher._id,
           date: targetDate,
-          subject: '',
+          subject: profileSubject,  
           absentTeacher: teacher.name || teacher.email || 'Unknown Teacher',
           status: '',
           checkIn: '',
@@ -596,7 +600,6 @@ const Attendance = () => {
                 <thead className="text-xs text-slate-500 border-b bg-green-50">
                   <tr>
                     <th className="py-3 text-left align-middle">Teacher</th>
-                    <th className="align-middle">Subject</th>
                     <th className="align-middle text-center">Date</th>
                     <th className="align-middle text-center">Status</th>
                     <th className="align-middle text-center w-28">Check In</th>
@@ -613,20 +616,6 @@ const Attendance = () => {
 
                     <td className="py-3 font-medium align-middle">
                       {row.absentTeacher}</td>
-
-                    <td className='align-middle text-center'>
-                      {isEditing ? (
-                        <select
-                          className="border rounded p-1 w-full cursor-pointer"
-                          value={editData.subject}
-                          onChange={e => setEditData({ ...editData, subject: e.target.value })}
-                          disabled={loading}
-                        >
-                          <option value="">Select Subject</option>
-                          {SUBJECT_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                      ) : row.subject || '-'}
-                    </td>
 
                     <td className='align-middle text-center'>
                       {row.date}</td>
@@ -717,7 +706,6 @@ const Attendance = () => {
                 <thead className="text-xs text-slate-500 border-b bg-orange-50">
                   <tr>
                     <th className="py-3 text-left align-middle">Teacher</th>
-                    <th className="align-middle">Subject</th>
                     <th className="align-middle text-center">Date</th>
                     <th className="align-middle text-center">Status</th>
                     <th className="align-middle text-center w-28">Check In</th>
@@ -734,19 +722,6 @@ const Attendance = () => {
                         <td className="py-3 font-medium align-middle">
                           {row.absentTeacher}</td>
                         <td className='align-middle text-center'>
-                          {isEditing ? (
-                            <select
-                              className="border rounded p-1 w-full cursor-pointer"
-                              value={editData.subject}
-                              onChange={e => setEditData({ ...editData, subject: e.target.value })}
-                              disabled={loading}
-                            >
-                              <option value="">Select Subject</option>
-                              {SUBJECT_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                            </select>
-                          ) : row.subject || '-'}
-                        </td>
-                        <td className='align-middle text-center'>
                           {row.date}</td>
                         <td className='align-middle text-center'>
                           {isEditing ? (
@@ -761,7 +736,7 @@ const Attendance = () => {
                                 <option key={s.value} value={s.value}>{s.label}</option>
                               ))}
                             </select>
-                          ) : row.status ? statusBadge(row.status) : '-'}
+                          ) : statusBadge(row.status)}
                         </td>
                         <td className='align-middle text-center w-28'>
                           {isEditing ? (
