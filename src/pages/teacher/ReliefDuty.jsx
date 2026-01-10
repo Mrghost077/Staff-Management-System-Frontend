@@ -35,6 +35,8 @@ const StatusBadge = ({ status }) => {
 const ReliefDuty = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  // State for date filter - defaults to today
+  const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
     const loadDuties = async () => {
@@ -64,6 +66,16 @@ const ReliefDuty = () => {
       alert("Failed to update status. Please try again.");
     }
   };
+
+  // Logic to filter rows based on selected date
+  const filteredRows = useMemo(() => {
+    if (!filterDate) return rows;
+    return rows.filter((row) => {
+      if (!row.attendance?.date) return false;
+      const rowDate = new Date(row.attendance.date).toISOString().split('T')[0];
+      return rowDate === filterDate;
+    });
+  }, [rows, filterDate]);
 
   const dashboardStats = useMemo(() => {
     if (!rows.length) return { total: 0, upcoming: 0, month: 0 };
@@ -118,7 +130,27 @@ const ReliefDuty = () => {
 
         {/* Duty Schedule Table */}
         <div className="bg-white rounded-xl shadow p-6 border">
-          <h2 className="font-bold text-lg mb-4">📅 My Relief Duty Schedule</h2>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+            <h2 className="font-bold text-lg">📅 My Relief Duty Schedule</h2>
+            
+            {/* Date Filter UI */}
+            <div className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm bg-white shadow-sm hover:border-blue-400 transition-colors">
+              <input
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="outline-none bg-transparent cursor-pointer"
+              />
+              {filterDate && (
+                <button 
+                  onClick={() => setFilterDate("")} 
+                  className="text-xs text-blue-600 hover:text-blue-800 font-medium ml-2 border-l pl-2"
+                >
+                  Clear Filter
+                </button>
+              )}
+            </div>
+          </div>
 
           {loading ? (
              <p className="text-center text-gray-500 py-8">Loading schedule...</p>
@@ -138,34 +170,42 @@ const ReliefDuty = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {rows.map((row) => {
-                    const rowId = row._id || row.id;
-                    const dateStr = row.attendance?.date 
-                      ? new Date(row.attendance.date).toLocaleDateString() 
-                      : "N/A";
-                    
-                    return (
-                      <tr key={rowId} className="hover:bg-gray-50">
-                        <td className="p-3 text-sm text-gray-900 font-medium">{dateStr}</td>
-                        <td className="p-3 text-sm text-gray-600">{getPeriodTime(row.period)}</td>
-                        <td className="p-3 text-sm text-gray-600">{row.subject}</td>
-                        <td className="p-3 text-sm text-gray-600 font-semibold">{row.grade}</td>
-                        <td className="p-3">
-                          <StatusBadge status={row.status} />
-                        </td>
-                        <td className="p-3">
-                          <select
-                            value={row.status === "completed" ? "completed" : "assigned"}
-                            onChange={(e) => handleStatusChange(rowId, e.target.value)}
-                            className="border rounded px-2 py-1 text-xs bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
-                          >
-                            <option value="assigned">Upcoming</option>
-                            <option value="completed">Completed</option>
-                          </select>
-                        </td>
-                      </tr>
-                    )
-                  })}
+                  {filteredRows.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="p-8 text-center text-gray-500">
+                        No relief duties found for the selected date.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredRows.map((row) => {
+                      const rowId = row._id || row.id;
+                      const dateStr = row.attendance?.date 
+                        ? new Date(row.attendance.date).toLocaleDateString() 
+                        : "N/A";
+                      
+                      return (
+                        <tr key={rowId} className="hover:bg-gray-50">
+                          <td className="p-3 text-sm text-gray-900 font-medium">{dateStr}</td>
+                          <td className="p-3 text-sm text-gray-600">{getPeriodTime(row.period)}</td>
+                          <td className="p-3 text-sm text-gray-600">{row.subject}</td>
+                          <td className="p-3 text-sm text-gray-600 font-semibold">{row.grade}</td>
+                          <td className="p-3">
+                            <StatusBadge status={row.status} />
+                          </td>
+                          <td className="p-3">
+                            <select
+                              value={row.status === "completed" ? "completed" : "assigned"}
+                              onChange={(e) => handleStatusChange(rowId, e.target.value)}
+                              className="border rounded px-2 py-1 text-xs bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                            >
+                              <option value="assigned">Upcoming</option>
+                              <option value="completed">Completed</option>
+                            </select>
+                          </td>
+                        </tr>
+                      )
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
