@@ -16,10 +16,10 @@ const AdminDashboard = () => {
   const [teacherAvailability, setTeacherAvailability] = useState([]);
 
   const quickActions = [
-    { title: "Add Teacher", path: "/admin/signup", bg: "bg-blue-50", hover: "hover:bg-blue-100", border: "border-blue-200", text: "text-blue-700", icon: Users },
-    { title: "Relief Assign", path: "/admin/relief-assignment", bg: "bg-emerald-50", hover: "hover:bg-emerald-100", border: "border-emerald-200", text: "text-emerald-700", icon: Users },
-    { title: "View Reports", path: "/admin/reports", bg: "bg-purple-50", hover: "hover:bg-purple-100", border: "border-purple-200", text: "text-purple-700", icon: TrendingUp },
-    { title: "Announcements", path: "/admin/announcements", bg: "bg-orange-50", hover: "hover:bg-orange-100", border: "border-orange-200", text: "text-orange-700", icon: Bell }
+    { title: "Add Teacher", path: "/admin/signup", bg: "bg-violet-100", hover: "hover:bg-violet-200", border: "border-violet-200", text: "text-violet-700", icon: Users },
+    { title: "Relief Assign", path: "/admin/relief-assignment", bg: "bg-lime-50", hover: "hover:bg-lime-100", border: "border-lime-200", text: "text-lime-700", icon: Users },
+    { title: "View Reports", path: "/admin/reports", bg: "bg-purple-100", hover: "hover:bg-purple-200", border: "border-purple-200", text: "text-purple-700", icon: TrendingUp },
+    { title: "Announcements", path: "/admin/announcements", bg: "bg-blue-100", hover: "hover:bg-blue-200", border: "border-blue-300", text: "text-blue-800", icon: Bell }
   ];
 
   useEffect(() => {
