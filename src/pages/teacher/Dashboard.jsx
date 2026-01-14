@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
 import axios from "axios";
 import {
   TrendingUp,
@@ -14,43 +15,18 @@ import {
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
-/* =======================
-   TOP BAR
-======================= */
-const TopBar = () => (
-  <header className="flex justify-between items-center bg-white p-5 rounded-xl shadow">
-    <h2 className="text-2xl font-semibold text-gray-800">
-      Teacher Dashboard
-    </h2>
-    <div className="flex items-center gap-4">
-      <button className="p-2 hover:bg-gray-100 rounded-full">
-        <Megaphone size={20} />
-      </button>
-      <button className="p-2 hover:bg-gray-100 rounded-full">
-        <User size={20} />
-      </button>
-    </div>
-  </header>
-);
+
 
 /* =======================
    STAT BOX
 ======================= */
-const StatBox = ({ title, value, subtitle, icon, bar }) => (
+const StatBox = ({ title, value, subtitle, icon }) => (
   <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
     <div className="flex justify-between items-center">
       <p className="text-gray-600 font-medium">{title}</p>
       {icon}
     </div>
     <h2 className="text-3xl font-bold mt-3">{value}</h2>
-    {bar && (
-      <div className="w-full h-2 bg-gray-200 rounded-full mt-4">
-        <div
-          className="h-full bg-black rounded-full"
-          style={{ width: value }}
-        />
-      </div>
-    )}
     {subtitle && (
       <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
     )}
@@ -217,24 +193,24 @@ export default function TeacherDashboard() {
 
 
   return (
-    <main className="flex-1 p-10 space-y-8 bg-gray-50">
-      <TopBar />
+   <>
+      <Header title="Teacher Dashboard" />
 
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-xl shadow">
-        <h2 className="text-2xl font-semibold">
-          Welcome back!
-        </h2>
-        <p className="text-sm opacity-90">
-          Here's your overview for today.
-        </p>
-      </div>
+      <main className="p-8 bg-gray-50 min-h-screen space-y-8">
+        <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-xl shadow">
+          <h2 className="text-2xl font-semibold">Welcome back!</h2>
+          <p className="text-sm opacity-90">
+            Here's your overview for today.
+          </p>
+        </div>
+    
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatBox
-          title="Attendance Rate"
-          value={`${dashboard.attendanceRate}%`}
+          title="All Attendance Count "
+          value={`${dashboard.attendanceCount}`}
           icon={<TrendingUp size={20} className="text-gray-500" />}
-          bar
+          
         />
 
         <StatBox
@@ -259,5 +235,6 @@ export default function TeacherDashboard() {
         <AnnouncementPreview data={dashboard.latestAnnouncement} />
       </div>
     </main>
+    </>
   );
 }
