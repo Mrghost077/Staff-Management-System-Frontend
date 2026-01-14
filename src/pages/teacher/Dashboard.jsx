@@ -90,22 +90,43 @@ const QuickActions = () => {
 const ReliefDuties = ({ data }) => {
   const navigate = useNavigate();
 
+  if (!data) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow border">
+        <h3 className="font-semibold text-lg flex items-center gap-2">
+          <CalendarClock size={20} /> Upcoming Relief Duty
+        </h3>
+        <p className="text-sm text-gray-500 mt-4">
+          No upcoming relief duties
+        </p>
+      </div>
+    );
+  }
+
+  const date = data.attendance?.date
+    ? new Date(data.attendance.date).toLocaleDateString()
+    : "N/A";
+
   return (
-    <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+    <div className="bg-white p-6 rounded-xl shadow border">
       <h3 className="font-semibold text-lg flex items-center gap-2">
-        <CalendarClock size={20} /> Upcoming Relief Duties
+        <CalendarClock size={20} /> Upcoming Relief Duty
       </h3>
 
-      {!data ? (
-        <p className="text-sm text-gray-500 mt-4">No upcoming relief duties</p>
-      ) : (
-        <div className="mt-4 bg-gray-50 p-4 rounded-lg flex justify-between items-center">
-          <p className="font-semibold text-gray-800">{data.className || "Relief Class"}</p>
-          <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
-            {new Date(data.date).toLocaleDateString()}
-          </span>
+      <div className="mt-4 bg-gray-50 p-4 rounded-lg flex justify-between items-center">
+        <div>
+          <p className="font-semibold text-gray-800">
+            {data.subject} — Class {data.grade}
+          </p>
+          <p className="text-xs text-gray-500">
+            Period {data.period}
+          </p>
         </div>
-      )}
+
+        <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
+          {date}
+        </span>
+      </div>
 
       <button
         onClick={() => navigate("/teacher/relief-duty")}
@@ -116,6 +137,8 @@ const ReliefDuties = ({ data }) => {
     </div>
   );
 };
+
+ 
 
 
 /* =======================
@@ -189,9 +212,9 @@ export default function TeacherDashboard() {
   if (loading) return <p className="p-10">Loading dashboard...</p>;
   if (error) return <p className="p-10 text-red-600">{error}</p>;
 
-  //  normalize upcoming relief (ARRAY or OBJECT)
+  //  normalize upcoming relief 
   const upcomingRelief = dashboard.upcomingRelief;
-  <ReliefDuties data={upcomingRelief} />
+
 
   return (
     <main className="flex-1 p-10 space-y-8 bg-gray-50">
