@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 
 
 import SignInPage from './pages/SignInPage';
+import ForgotPassword from './pages/ForgotPassword';
 import NotAuthorized from './pages/NotAuthorized';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -24,6 +25,7 @@ import TeacherReliefDuty from './pages/teacher/ReliefDuty';
 import TeacherAnnouncements from './pages/teacher/Announcements';
 import TeacherSettings from './pages/teacher/Settings';
 import TeacherTimeTable from './pages/teacher/TimeTable'; 
+import TeacherReports from './pages/teacher/TeacherReports';
 
 const PrivateRoute = ({ children, role }) => {
   const { user, loading } = useUser();
@@ -44,7 +46,7 @@ const PrivateRoute = ({ children, role }) => {
 
 const App = () => {
 
-  const { user, loading } = useUser();
+  const {loading } = useUser();
   
   // Check Dark Mode status when the app starts
   useEffect(() => {
@@ -75,6 +77,7 @@ const App = () => {
       />
     <Routes>
       <Route path="/" element={<SignInPage />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Admin Routes */}
       <Route
@@ -113,6 +116,7 @@ const App = () => {
         <Route path="leave" element={<TeacherLeaveManagement />} />
         <Route path="relief-duty" element={<TeacherReliefDuty />} />
         <Route path="announcements" element={<TeacherAnnouncements />} />
+        <Route path="reports" element={<TeacherReports />} />
         <Route path="settings" element={<TeacherSettings />} />
       </Route>
 

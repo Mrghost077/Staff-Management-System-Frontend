@@ -53,3 +53,14 @@ export const fetchReliefReports = async (date) => {
     return [];
   }
 };
+export const fetchTeacherPersonalReports = async (date) => {
+  try {
+    const response = await apiClient.get("/teacher-reports/my-reports", {
+      params: date ? { date: date } : {},
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Teacher Personal Reports Fetch Error:", error);
+    throw error;
+  }
+};

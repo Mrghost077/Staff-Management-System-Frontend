@@ -8,7 +8,7 @@ const SignInPage = () => {
   const { refreshUser } = useUser(); 
 
   // Backend URL 
- const apiUrl = "http://localhost:3301";
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3301";
 
 
   // States
@@ -165,6 +165,17 @@ const SignInPage = () => {
               )}
             </span>
             {passwordError && <p className="text-red-500 text-xs mt-1">{passwordError}</p>}
+            
+      
+            <div className="flex justify-end mt-1">
+              <button
+                type="button"
+                onClick={() => navigate("/forgot-password")}
+                className="text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline transition-all"
+              >
+                Forgot Password?
+              </button>
+            </div>
           </div>
 
           <div>
