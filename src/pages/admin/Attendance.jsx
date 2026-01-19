@@ -629,7 +629,7 @@ const Attendance = () => {
                 <CheckCircle size={16} /> Marked Attendance ({markedTeachers.length})
               </h3>
               <table className="w-full border-collapse">
-                <thead className="text-xs text-slate-500 border-b bg-green-100">
+                <thead className="text-xs text-slate-500 border-b bg-green-100 dark:bg-green-200">
                   <tr>
                     <th className="py-3 text-left align-middle">Teacher</th>
                     <th className="align-middle text-center">Date</th>
@@ -735,7 +735,7 @@ const Attendance = () => {
                 <Clock size={16} /> Pending Attendance ({unmarkedTeachers.length})
               </h3>
               <table className="w-full border-collapse">
-                <thead className="text-xs text-slate-500 border-b bg-orange-50">
+                <thead className="text-xs text-slate-500 border-b bg-orange-50 dark:bg-orange-100">
                   <tr>
                     <th className="py-3 text-left align-middle">Teacher</th>
                     <th className="align-middle text-center">Date</th>

@@ -164,7 +164,7 @@ const AdminNavbar = () => {
               `group flex items-center rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md ${
                 isActive
                   ? 'bg-gradient-to-r from-slate-900 to-slate-800 dark:from-indigo-600 dark:to-indigo-700 text-white shadow-lg shadow-slate-900/30 dark:shadow-indigo-500/50 ring-2 ring-slate-200/50 dark:ring-indigo-400/30'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/80 hover:text-slate-900 dark:hover:text-white bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm'
+                  : 'text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 hover:text-slate-900 dark:hover:text-white bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm'
               }`
             }
           >

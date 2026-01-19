@@ -167,7 +167,7 @@ const Attendance = () => {
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-300 overflow-hidden">
           <table className="w-full">
-            <thead className="bg-green-100 border-b border-gray-200">
+            <thead className="bg-green-100 dark:bg-green-200 border-b border-gray-200">
               <tr>
                 <th className="p-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Date</th>
                 <th className="p-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Check In</th>
