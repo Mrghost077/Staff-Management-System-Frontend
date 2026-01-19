@@ -15,7 +15,7 @@ const LeaveApplyForm = ({ onSubmit, onCancel, isSubmitting }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const fileInputRef = useRef(null)
 
-  const leaveTypes = ['Annual Leave', 'Medical Leave', 'Personal Leave', 'Emergency Leave']
+  const leaveTypes = ['Medical Leave', 'Personal Leave', 'Emergency Leave']
 
   const validateForm = () => {
     const newErrors = {}
