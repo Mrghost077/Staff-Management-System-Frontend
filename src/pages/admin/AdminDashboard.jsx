@@ -91,8 +91,7 @@ const AdminDashboard = () => {
         {error && <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-red-700 text-sm">{error}</div>}
 
         {/* ADMIN OVERVIEW */}
-        <div className="bg-gradient-to-r from-purple-500 via-purple-600 to-pink-500
-  dark:from-purple-300 dark:via-purple-400 dark:to-pink-300 rounded-2xl p-8 text-white shadow-lg">
+        <div className="bg-gradient-to-r from-purple-500 via-purple-600 to-pink-500 dark:from-purple-300 dark:via-purple-400 dark:to-pink-300 rounded-2xl p-8 text-white shadow-lg">
           <h2 className="text-3xl font-bold mb-2">Admin Overview</h2>
           <p className="text-purple-100">Manage your school's teaching staff and operations.</p>
         </div>
